@@ -1,0 +1,89 @@
+% main_extended.tex 
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{balance}
+\captionsetup{font=footnotesize}
+\allowdisplaybreaks
+
+\title{Reinforcement Learning–Based Timeliness-Aware Image Transmission over Wireless Networks}
+\author{\IEEEauthorblockN{Miadzvedzeva Viktoryia}
+\IEEEauthorblockA{Student ID: 202530202013 \\ Email: vemedvedeva@edu.hse.ru \\ University: Higher School of Economics}
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Timely and reliable image transmission is essential for many time-sensitive wireless applications such as remote sensing, surveillance, and IoT monitoring. Conventional separate source and channel coding approaches struggle to simultaneously meet strict latency and fidelity requirements under varying channel conditions. Motivated by recent advances in semantic communication and deep joint source-channel coding (JSCC), this project develops a simplified, reproducible reinforcement learning (RL) framework that adaptively controls transmission decisions to maximize a timeliness-aware utility. We propose a model-free Monte Carlo $\epsilon$-greedy agent that selects compression level and code length per image based on observed channel and system state, optimizing a reward that balances reconstruction quality (PSNR) and freshness (Value of Information, VoI). We outline the simulator, evaluation metrics, and an experimental plan aimed at validating the approach on small image datasets.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Reinforcement learning, Monte Carlo, $\epsilon$-greedy, Joint source-channel coding, timeliness, image transmission
+\end{IEEEkeywords}
+
+\section{Motivation and Background}
+Real-time image delivery is critical for modern cyber-physical systems including autonomous vehicles, industrial IoT, and surveillance drones. These systems often operate under constrained bandwidth and fluctuating signal-to-noise ratios (SNR), making conventional Shannon-style communication inefficient. Deep Joint Source-Channel Coding (JSCC) \cite{bourtsoulatze2019deep} integrates compression and channel protection in a single neural model, achieving graceful degradation under noise. Yet, deep JSCC models typically assume static transmission policies, ignoring the temporal importance of information.
+
+The concept of \textit{timeliness}—measured via Age or Value of Information (AoI/VoI) \cite{wang2022voi}—has recently emerged as a new quality metric emphasizing how \textit{fresh} data is at the receiver. For real-time decision-making, a slightly lower quality but newer image may be far more valuable than a high-quality but outdated one. Thus, reinforcement learning (RL) can serve as an adaptive decision layer that learns optimal encoding and transmission policies in dynamic environments without explicit channel modeling.
+
+\section{Related Work}
+Recent literature spans three relevant areas: (i) deep JSCC and semantic communication \cite{kurka2021bandwidth, liu2021swin}, (ii) RL for communication resource allocation \cite{mnih2015human, schulman2017ppo}, and (iii) timeliness-aware optimization \cite{bian2023deepjsccpp, yang2025timeliness}. Deep JSCC approaches demonstrate robustness to channel distortion but rely on fixed compression ratios. RL-based wireless scheduling has achieved adaptive power control and rate optimization but rarely integrates perceptual quality. Our work aims to connect these domains by employing RL to dynamically tune compression and code length according to channel and task states.
+
+\section{Problem Formulation}
+We model adaptive image transmission as a discrete-time Markov Decision Process (MDP). At each step, the agent observes channel and system features, selects transmission parameters, receives a reward, and updates its policy. 
+
+\subsection{State space}
+\[
+s_t = [\text{SNR}_t, \text{CBR}_t, \text{PSNR}_{t-1}, \text{AoI}_t, \text{queue\_len}_t, \text{img\_priority}_t]
+\]
+where each element is continuous but discretized for tabular RL.
+
+\subsection{Action space}
+Each action controls compression level and coding length:
+\[
+A = \{(c_i,l_j)\ |\ c_i \in \{low,mid,high\},\ l_j \in \{L_1,L_2,L_3\}\}
+\]
+resulting in 9 discrete combinations.
+
+\subsection{Reward design}
+We design a normalized scalar reward:
+\begin{equation}
+r_t = \alpha \frac{\text{PSNR}_t}{\text{PSNR}_{max}} + 
+\beta \frac{\text{VoI}_t}{\text{VoI}_{max}} -
+\gamma \frac{\Delta t_t}{T_{ref}},
+\end{equation}
+where $\alpha+\beta+\gamma=1$ tune the trade-off between image fidelity, freshness, and delay.
+
+\section{Methodology}
+A model-free Monte Carlo $\epsilon$-greedy approach is selected due to its simplicity and interpretability. The agent maintains a table of state-action values $Q(s,a)$, initialized to zero. After each full episode (sequence of transmissions), it computes returns and updates:
+\[
+Q(s,a) \leftarrow Q(s,a) + \eta [G_t - Q(s,a)]
+\]
+where $G_t$ is the cumulative discounted reward and $\eta$ the learning rate. The policy follows $\epsilon$-greedy exploration, balancing exploitation of known high-value actions with random exploration. 
+
+This algorithm avoids differentiability constraints and can be directly applied to discrete environments. For scalability, future work can replace it with Deep Q-Network (DQN) or policy-gradient methods such as PPO.
+
+\section{Experimental Plan and Discussion}
+Experiments will simulate variable SNR channels and simple delay models, using small datasets (e.g., CIFAR-10). Baselines include fixed JSCC and random transmission. Expected outcomes: the RL agent achieves improved average VoI while maintaining competitive PSNR. We will analyze learning curves, parameter sensitivity, and policy stability under changing conditions.
+
+\section{Future Work}
+Planned extensions include integrating deep JSCC models (CNN-based encoders), applying policy-gradient RL (PPO), and evaluating multi-user scheduling. Future iterations will also explore real-world network traces and partial observability (POMDP) settings.
+
+\section{Expected Contributions}
+This study contributes: (1) a reproducible framework for RL-driven timeliness-aware transmission, (2) quantitative trade-off analysis between fidelity and freshness, and (3) groundwork for deep RL integration into semantic communication systems.
+
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{reference}
+
+\end{document}
