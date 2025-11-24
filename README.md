@@ -9,6 +9,28 @@ The project includes a reproducible Python simulator and a LaTeX report (IEEE fo
 ---
 ### State for 24.11.2025:
 * Folder "Project(Experiments) added. File "cartPole_autodecoder(working24.11).ipynb" added - trained Autoencoder (12 epochs)
+* The file DQN_project_for26.11.25.ipynb in Project/experiments/ contains the full pipeline integrating an Autoencoder and a Deep Q-Network (DQN) for dynamic latent-space compression.
+### What the project does:
+* Trains a sequential Autoencoder (encoder + causal decoder) on a dataset of 64×64 grayscale frames.
+* Uses latent truncation (different K sizes) to simulate multiple compression levels.
+* Implements a custom Gym-like environment where the agent chooses the truncation level K at each time step.
+* Trains a DQN to select the optimal K based on the current reconstructed frame.
+* Evaluates the trained policy and saves a reconstructed video (dqn_reconstructed.mp4).
+
+### How DQN is used:
+* Observation: reconstructed frame.
+* Action: index selecting one of the allowed K values.
+* Reward: negative reconstruction error (lower error = higher reward).
+* Goal: learn when to use high-detail vs. high-compression latent codes.
+
+### Result.
+
+The notebook demonstrates:
+
+* A working sequential AE
+* A functional K-selection environment
+* A trained DQN policy
+* A reconstructed video showing how the agent chooses compression across time
 
 ---
 
