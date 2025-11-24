@@ -7,6 +7,10 @@ We propose a **Monte Carlo ε-greedy agent** that dynamically adjusts image comp
 The project includes a reproducible Python simulator and a LaTeX report (IEEE format).
 
 ---
+### State for 24.11.2025:
+* Folder "Project(Experiments) added. File "cartPole_autodecoder(working24.11).ipynb" added - trained Autoencoder (12 epochs)
+
+---
 
 ## State for 12.11.2025:
 #!/bin/bash
